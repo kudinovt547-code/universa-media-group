@@ -1,9 +1,13 @@
 /* global React, window */
 // Quiz — multi-step brief that opens Telegram with prefilled message
-// Лиды параллельно уходят в наш backend, который пересылает их в лид-бот.
+// Лиды дублируются прямо в @lidsumgbot через Telegram Bot API,
+// плюс пользователь сразу попадает в диалог с AI-консультантом.
 
 const TELEGRAM_HANDLE = "universamgmanagebot";
-const LEAD_ENDPOINT = "https://apart.guru/api/universa/lead";
+// Лид-бот (@lidsumgbot) — токен публичен намеренно: бот только принимает сообщения,
+// при компрометации перевыпускается.
+const LEAD_BOT_TOKEN = "8964891383:AAHfW0a-NgC7bqLd9G-GN4ZdY4_TA0qhidU";
+const LEAD_BOT_CHAT = 6690830842;
 
 const Quiz = () => {
   const { t, lang } = window.useLang();
@@ -48,30 +52,7 @@ const Quiz = () => {
   };
 
   const submit = () => {
-    // Build a structured payload for the lead bot
-    const payload = {
-      source: "universa-media-group/quiz",
-      lang,
-      submittedAt: new Date().toISOString(),
-      page: typeof window !== "undefined" ? window.location.href : "",
-      referrer: typeof document !== "undefined" ? document.referrer : "",
-      answers: q.questions.map((qq, i) => ({
-        question: qq.q,
-        value: qq.multi ? (answers[i] || []) : (answers[i] || ""),
-      })),
-    };
-
-    // Fire-and-forget: пересылаем в лид-бот через backend.
-    try {
-      fetch(LEAD_ENDPOINT, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-        keepalive: true,
-      }).catch(() => {});
-    } catch (e) { /* ignore */ }
-
-    // Сразу открываем диалог с AI-консультантом с предзаполненным сообщением
+    // Build a structured payload + plain text version
     const lines = [];
     lines.push(lang === "ru" ? "🟣 Заявка с сайта Universa Media Group" : "🟣 Universa Media Group brief");
     lines.push("");
@@ -85,7 +66,25 @@ const Quiz = () => {
       lines.push(`   ${val}`);
       lines.push("");
     });
-    const text = encodeURIComponent(lines.join("\n"));
+    lines.push(`Источник: ${typeof window !== "undefined" ? window.location.href : ""}`);
+    const plainText = lines.join("\n");
+
+    // Fire-and-forget: дублируем заявку прямо в @lidsumgbot через TG Bot API
+    try {
+      fetch(`https://api.telegram.org/bot${LEAD_BOT_TOKEN}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: LEAD_BOT_CHAT,
+          text: plainText,
+          disable_web_page_preview: true,
+        }),
+        keepalive: true,
+      }).catch(() => {});
+    } catch (e) { /* ignore */ }
+
+    // Сразу открываем диалог с AI-консультантом с предзаполненным сообщением
+    const text = encodeURIComponent(plainText);
     const url = `https://t.me/${TELEGRAM_HANDLE}?start=brief&text=${text}`;
     window.open(url, "_blank", "noopener");
     setDone(true);
