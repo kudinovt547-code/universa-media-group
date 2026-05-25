@@ -958,40 +958,75 @@ html[data-theme="light"] .mesh-vignette { opacity: 0.4; }
 }
 .contact-big a:hover { animation: hue 4s linear infinite; }
 
-/* Shimmer-кнопка «менеджером» — переливающийся градиент + лёгкое движение */
+/* Кликабельная «бегущая строка» вокруг слова «менеджером» —
+   яркий градиент-бегунок + светящееся подчёркивание-полоска. */
 .contact-shimmer-link {
   text-decoration: none;
   display: inline-block;
+  position: relative;
+  padding-bottom: 0.04em;
+  cursor: pointer;
 }
 .contact-shimmer {
   background: linear-gradient(
-    100deg,
-    var(--brand-300) 0%,
-    var(--brand-500) 20%,
-    #f0abfc 40%,
-    var(--brand-400) 60%,
-    var(--brand-500) 80%,
-    var(--brand-300) 100%
+    90deg,
+    #f0abfc 0%,
+    var(--brand-300) 18%,
+    var(--brand-500) 36%,
+    #f0abfc 54%,
+    var(--brand-300) 72%,
+    var(--brand-500) 90%,
+    #f0abfc 100%
   );
-  background-size: 220% 100%;
+  background-size: 300% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
   display: inline-block;
-  animation: contact-shimmer-flow 3.6s linear infinite;
-  transition: filter 0.25s var(--ease-out);
+  white-space: nowrap;
+  animation: contact-shimmer-flow 1.8s linear infinite;
+  filter: drop-shadow(0 0 18px rgba(167, 139, 250, 0.45));
+  transition: filter 0.25s var(--ease-out), transform 0.25s var(--ease-out);
+}
+.contact-shimmer-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.02em;
+  height: 0.06em;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--brand-400) 18%,
+    #f0abfc 50%,
+    var(--brand-400) 82%,
+    transparent 100%
+  );
+  background-size: 220% 100%;
+  animation: contact-shimmer-underline 1.8s linear infinite;
+  opacity: 0.9;
 }
 .contact-shimmer-link:hover .contact-shimmer {
-  filter: drop-shadow(0 0 28px var(--brand-glow));
-  animation-duration: 1.6s;
+  filter: drop-shadow(0 0 32px var(--brand-glow));
+  transform: translateY(-0.01em);
+  animation-duration: 1.1s;
 }
+.contact-shimmer-link:hover::after { animation-duration: 1.1s; opacity: 1; }
+
 @keyframes contact-shimmer-flow {
   0%   { background-position: 0% 50%; }
-  100% { background-position: -220% 50%; }
+  100% { background-position: -300% 50%; }
+}
+@keyframes contact-shimmer-underline {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 220% 50%; }
 }
 @media (prefers-reduced-motion: reduce) {
   .contact-shimmer { animation: none; background-position: 50% 50%; }
+  .contact-shimmer-link::after { animation: none; }
 }
 @keyframes hue {
   to { filter: hue-rotate(360deg); }
