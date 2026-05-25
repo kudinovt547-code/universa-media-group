@@ -1,7 +1,9 @@
 /* global React, window */
 // Quiz — multi-step brief that opens Telegram with prefilled message
+// Лиды параллельно уходят в наш backend, который пересылает их в лид-бот.
 
-const TELEGRAM_HANDLE = "Timofeykudinov";
+const TELEGRAM_HANDLE = "universamgmanagebot";
+const LEAD_ENDPOINT = "https://apart.guru/api/universa/lead";
 
 const Quiz = () => {
   const { t, lang } = window.useLang();
@@ -46,7 +48,30 @@ const Quiz = () => {
   };
 
   const submit = () => {
-    // Build the Telegram message
+    // Build a structured payload for the lead bot
+    const payload = {
+      source: "universa-media-group/quiz",
+      lang,
+      submittedAt: new Date().toISOString(),
+      page: typeof window !== "undefined" ? window.location.href : "",
+      referrer: typeof document !== "undefined" ? document.referrer : "",
+      answers: q.questions.map((qq, i) => ({
+        question: qq.q,
+        value: qq.multi ? (answers[i] || []) : (answers[i] || ""),
+      })),
+    };
+
+    // Fire-and-forget: пересылаем в лид-бот через backend.
+    try {
+      fetch(LEAD_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        keepalive: true,
+      }).catch(() => {});
+    } catch (e) { /* ignore */ }
+
+    // Сразу открываем диалог с AI-консультантом с предзаполненным сообщением
     const lines = [];
     lines.push(lang === "ru" ? "🟣 Заявка с сайта Universa Media Group" : "🟣 Universa Media Group brief");
     lines.push("");
@@ -61,7 +86,7 @@ const Quiz = () => {
       lines.push("");
     });
     const text = encodeURIComponent(lines.join("\n"));
-    const url = `https://t.me/${TELEGRAM_HANDLE}?text=${text}`;
+    const url = `https://t.me/${TELEGRAM_HANDLE}?start=brief&text=${text}`;
     window.open(url, "_blank", "noopener");
     setDone(true);
   };
