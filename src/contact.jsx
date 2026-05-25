@@ -24,6 +24,7 @@ const Marquee = () => {
 const Contact = () => {
   const { t } = window.useLang();
   const c = t.contact;
+  const href = c.handleHref || `https://t.me/${(c.handle || "").replace("@", "")}`;
   return (
     <section className="contact container" id="contact">
       <window.SectionTag>{c.tag}</window.SectionTag>
@@ -34,8 +35,8 @@ const Contact = () => {
         <h2 className="contact-big" style={{ marginTop: 32 }}>
           {c.lead} {c.mid}{" "}
           <window.Magnetic strength={0.12}>
-            <a href={`https://t.me/${c.handle.replace("@", "")}`} target="_blank" rel="noopener">
-              {c.handle}
+            <a href={href} target="_blank" rel="noopener" className="contact-shimmer-link">
+              <span className="contact-shimmer" aria-hidden="false">{c.handle}</span>
             </a>
           </window.Magnetic>
           {c.end}

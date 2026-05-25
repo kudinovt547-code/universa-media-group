@@ -206,7 +206,8 @@ const I18N = {
       tag: "05 / Связь",
       lead: "Поговорите",
       mid: "с",
-      handle: "@universamgmanagebot",
+      handle: "менеджером",
+      handleHref: "https://t.me/universamgmanagebot",
       end: " — AI-консультант студии, на связи 24/7.",
       meta: [
         { k: "Канал связи", v: "AI-консультант · Telegram" },
@@ -348,7 +349,8 @@ const I18N = {
       tag: "05 / Contact",
       lead: "Talk",
       mid: "to",
-      handle: "@universamgmanagebot",
+      handle: "the manager",
+      handleHref: "https://t.me/universamgmanagebot",
       end: " — our AI consultant, on duty 24/7.",
       meta: [
         { k: "Channel", v: "AI consultant · Telegram" },

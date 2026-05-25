@@ -957,6 +957,42 @@ html[data-theme="light"] .mesh-vignette { opacity: 0.4; }
   display: inline-block;
 }
 .contact-big a:hover { animation: hue 4s linear infinite; }
+
+/* Shimmer-кнопка «менеджером» — переливающийся градиент + лёгкое движение */
+.contact-shimmer-link {
+  text-decoration: none;
+  display: inline-block;
+}
+.contact-shimmer {
+  background: linear-gradient(
+    100deg,
+    var(--brand-300) 0%,
+    var(--brand-500) 20%,
+    #f0abfc 40%,
+    var(--brand-400) 60%,
+    var(--brand-500) 80%,
+    var(--brand-300) 100%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  animation: contact-shimmer-flow 3.6s linear infinite;
+  transition: filter 0.25s var(--ease-out);
+}
+.contact-shimmer-link:hover .contact-shimmer {
+  filter: drop-shadow(0 0 28px var(--brand-glow));
+  animation-duration: 1.6s;
+}
+@keyframes contact-shimmer-flow {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: -220% 50%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .contact-shimmer { animation: none; background-position: 50% 50%; }
+}
 @keyframes hue {
   to { filter: hue-rotate(360deg); }
 }
@@ -1064,7 +1100,7 @@ html[data-theme="light"] .mesh-vignette { opacity: 0.4; }
   font-weight: 500;
   letter-spacing: -0.04em;
   white-space: nowrap;
-  animation: ticker 35s linear infinite;
+  animation: ticker 16s linear infinite;
   color: var(--fg-0);
 }
 .marquee-track .accent {
